@@ -1,0 +1,37 @@
+// SubjectCard Component Styles
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-md;
+  min-height: 140px;
+}
+
+.content {
+  @include m.flex-column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: v.$spacing-sm;
+}
+
+.icon {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.name {
+  font-size: v.$font-size-lg;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+}
+
+.progressArea {
+  @include m.flex-column;
+  gap: v.$spacing-xs;
+}
+
+.progressLabel {
+  font-size: v.$font-size-xs;
+  color: v.$text-secondary;
+}

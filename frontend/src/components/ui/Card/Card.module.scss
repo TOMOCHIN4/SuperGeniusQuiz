@@ -1,0 +1,50 @@
+// Card Component Styles
+
+.card {
+  @include m.card;
+  position: relative;
+  overflow: hidden;
+}
+
+.interactive {
+  @include m.card-interactive;
+}
+
+// Padding Variants
+.paddingNone {
+  .content {
+    padding: 0;
+  }
+}
+
+.paddingSm {
+  .content {
+    padding: v.$spacing-sm;
+  }
+}
+
+.paddingMd {
+  .content {
+    padding: v.$spacing-md;
+  }
+}
+
+.paddingLg {
+  .content {
+    padding: v.$spacing-lg;
+  }
+}
+
+// Accent Bar (教科カラー用)
+.accentBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: var(--accent-color);
+}
+
+.content {
+  position: relative;
+}

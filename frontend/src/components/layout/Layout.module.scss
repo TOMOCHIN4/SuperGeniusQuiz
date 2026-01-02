@@ -1,0 +1,15 @@
+// Layout Component Styles
+
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1;
+  padding: v.$spacing-md;
+  max-width: v.$breakpoint-lg;
+  width: 100%;
+  margin: 0 auto;
+}

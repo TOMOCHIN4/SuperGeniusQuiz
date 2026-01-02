@@ -1,0 +1,17 @@
+// BarChart Component Styles
+
+.wrapper {
+  width: 100%;
+}
+
+.title {
+  margin: 0 0 v.$spacing-sm 0;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-medium;
+  color: v.$text-primary;
+}
+
+.chartContainer {
+  width: 100%;
+  position: relative;
+}

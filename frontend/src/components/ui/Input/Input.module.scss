@@ -1,0 +1,65 @@
+// Input Component Styles
+
+.wrapper {
+  @include m.flex-column;
+  gap: v.$spacing-xs;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.label {
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-medium;
+  color: v.$text-primary;
+}
+
+.input {
+  width: 100%;
+  padding: v.$spacing-sm v.$spacing-md;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-base;
+  color: v.$text-primary;
+  background-color: v.$white;
+  border: 2px solid v.$divider;
+  border-radius: v.$radius-md;
+  outline: none;
+  transition:
+    border-color v.$transition-fast,
+    box-shadow v.$transition-fast;
+
+  &::placeholder {
+    color: v.$text-secondary;
+    opacity: 0.6;
+  }
+
+  &:hover:not(:disabled):not(:focus) {
+    border-color: v.$divider-dark;
+  }
+
+  &:focus {
+    border-color: v.$brand-blue;
+    box-shadow: 0 0 0 3px rgba(v.$brand-blue, 0.15);
+  }
+
+  &:disabled {
+    background-color: v.$bg-white;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.error {
+  border-color: v.$color-error;
+
+  &:focus {
+    border-color: v.$color-error;
+    box-shadow: 0 0 0 3px rgba(v.$color-error, 0.15);
+  }
+}
+
+.errorMessage {
+  font-size: v.$font-size-sm;
+  color: v.$color-error;
+}

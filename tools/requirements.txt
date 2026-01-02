@@ -1,0 +1,2 @@
+# Gemini API (公式推奨SDK)
+google-genai>=1.0.0

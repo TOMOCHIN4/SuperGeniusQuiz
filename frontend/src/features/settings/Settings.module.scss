@@ -1,0 +1,90 @@
+// Settings Page Styles
+
+.container {
+  @include m.flex-column;
+  gap: v.$spacing-md;
+  padding: v.$spacing-md;
+  padding-bottom: v.$spacing-xl;
+}
+
+.title {
+  margin: 0;
+  font-size: v.$font-size-xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+}
+
+.card {
+  padding: v.$spacing-md;
+}
+
+.sectionTitle {
+  margin: 0 0 v.$spacing-md 0;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: v.$spacing-md;
+}
+
+.avatar {
+  @include m.flex-center;
+  width: 48px;
+  height: 48px;
+  font-size: v.$font-size-lg;
+  font-weight: v.$font-weight-bold;
+  color: v.$white;
+  background-color: v.$brand-blue;
+  border-radius: v.$radius-full;
+}
+
+.userDetails {
+  @include m.flex-column;
+  gap: v.$spacing-xs;
+}
+
+.userName {
+  font-size: v.$font-size-lg;
+  font-weight: v.$font-weight-medium;
+  color: v.$text-primary;
+}
+
+.userRole {
+  font-size: v.$font-size-sm;
+  color: v.$text-secondary;
+}
+
+.settingItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: v.$spacing-sm 0;
+  border-bottom: 1px solid v.$divider;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  &:first-of-type {
+    padding-top: 0;
+  }
+}
+
+.settingLabel {
+  font-size: v.$font-size-base;
+  color: v.$text-primary;
+}
+
+.settingValue {
+  font-size: v.$font-size-base;
+  color: v.$text-secondary;
+}
+
+.logoutArea {
+  margin-top: v.$spacing-md;
+}

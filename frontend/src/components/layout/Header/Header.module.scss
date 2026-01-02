@@ -1,0 +1,79 @@
+// Header Component Styles
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: v.$z-sticky;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  padding: 0 v.$spacing-md;
+  background-color: v.$card-white;
+  box-shadow: v.$shadow-sm;
+}
+
+.spacer {
+  width: 44px; // ユーザーボタンと同じ幅
+}
+
+.logoLink {
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.logo {
+  font-size: v.$font-size-xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.userArea {
+  @include m.flex-center;
+}
+
+.userButton {
+  @include m.button-reset;
+  @include m.focus-ring;
+  @include m.flex-center;
+  width: 44px;
+  height: 44px;
+  border-radius: v.$radius-full;
+  background-color: v.$brand-blue;
+  color: v.$white;
+  transition:
+    background-color v.$transition-fast,
+    transform v.$transition-fast;
+
+  &:hover {
+    background-color: v.$brand-blue-hover;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.guest {
+  background-color: v.$text-secondary;
+
+  &:hover {
+    background-color: v.$text-secondary-hover;
+  }
+}
+
+.userInitial {
+  font-size: v.$font-size-lg;
+  font-weight: v.$font-weight-bold;
+  text-transform: uppercase;
+}
+
+.userIcon {
+  width: 24px;
+  height: 24px;
+}

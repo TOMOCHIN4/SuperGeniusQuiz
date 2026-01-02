@@ -1,0 +1,56 @@
+// Result Page Styles
+
+.container {
+  @include m.flex-column;
+  gap: v.$spacing-lg;
+  padding: v.$spacing-md;
+  padding-bottom: v.$spacing-xl;
+}
+
+.resultCard {
+  padding: v.$spacing-xl;
+  text-align: center;
+}
+
+.title {
+  margin: 0 0 v.$spacing-lg 0;
+  font-size: v.$font-size-xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+}
+
+.chartArea {
+  @include m.flex-center;
+  margin-bottom: v.$spacing-lg;
+}
+
+.message {
+  margin: 0 0 v.$spacing-md 0;
+  font-size: v.$font-size-2xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+}
+
+.scoreDetail {
+  @include m.flex-column;
+  gap: v.$spacing-xs;
+}
+
+.subject {
+  font-size: v.$font-size-sm;
+  color: v.$brand-blue;
+  background-color: rgba(v.$brand-blue, 0.1);
+  padding: v.$spacing-xs v.$spacing-sm;
+  border-radius: v.$radius-full;
+  display: inline-block;
+}
+
+.scoreText {
+  font-size: v.$font-size-lg;
+  color: v.$text-secondary;
+}
+
+.actions {
+  @include m.flex-column;
+  gap: v.$spacing-sm;
+}

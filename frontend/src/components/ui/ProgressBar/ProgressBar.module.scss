@@ -1,0 +1,44 @@
+// ProgressBar Component Styles
+
+.wrapper {
+  @include m.flex-between;
+  gap: v.$spacing-sm;
+}
+
+.track {
+  flex: 1;
+  background-color: v.$bg-white;
+  border-radius: v.$radius-full;
+  overflow: hidden;
+}
+
+// Sizes
+.sm {
+  height: 4px;
+}
+
+.md {
+  height: 8px;
+}
+
+.lg {
+  height: 12px;
+}
+
+.fill {
+  height: 100%;
+  background-color: v.$brand-blue;
+  border-radius: v.$radius-full;
+}
+
+.animated {
+  transition: width v.$transition-normal;
+}
+
+.label {
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-medium;
+  color: v.$text-secondary;
+  min-width: 40px;
+  text-align: right;
+}

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>超天才クイズ v4</title>
+  <style>
+    /* シンプル・軽量なスタイル */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .screen {
+      display: none;
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: #4A90D9;
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .btn-choice {
+      background: white;
+      border: 2px solid #ddd;
+      text-align: left;
+    }
+
+    .btn-choice:hover {
+      border-color: #4A90D9;
+    }
+
+    .btn-choice.selected {
+      border-color: #4A90D9;
+      background: #e8f4fd;
+    }
+
+    .btn-choice.correct {
+      border-color: #4CAF50;
+      background: #e8f5e9;
+    }
+
+    .btn-choice.wrong {
+      border-color: #f44336;
+      background: #ffebee;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .timer {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #4A90D9;
+      margin: 16px 0;
+    }
+
+    .progress {
+      text-align: center;
+      color: #666;
+      margin-bottom: 16px;
+    }
+
+    .question-text {
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .stats-card {
+      background: #f5f5f5;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 8px 0;
+    }
+
+    .stats-value {
+      font-size: 32px;
+      font-weight: bold;
+      color: #4A90D9;
+    }
+
+    .genre-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- ログイン画面 -->
+    <div id="login-screen" class="screen active">
+      <h1>超天才クイズ</h1>
+      <input type="text" id="username" placeholder="ユーザー名">
+      <input type="password" id="password" placeholder="パスワード">
+      <button class="btn btn-primary" onclick="login()">ログイン</button>
+    </div>
+
+    <!-- ホーム画面 -->
+    <div id="home-screen" class="screen">
+      <h1>ようこそ！</h1>
+      <div class="stats-card">
+        <div>総問題数: <span id="total-questions">0</span></div>
+        <div>正答率: <span id="accuracy">0</span>%</div>
+      </div>
+      <button class="btn btn-primary" onclick="showSubjects()">PLAY</button>
+      <button class="btn btn-secondary" onclick="showStats()">詳細分析</button>
+    </div>
+
+    <!-- 教科選択画面 -->
+    <div id="subject-screen" class="screen">
+      <h1>教科を選択</h1>
+      <button class="btn btn-secondary" onclick="selectSubject('jp')">国語</button>
+      <button class="btn btn-secondary" onclick="selectSubject('math')">算数</button>
+      <button class="btn btn-secondary" onclick="selectSubject('sci')">理科</button>
+      <button class="btn btn-secondary" onclick="selectSubject('soc')">社会</button>
+      <button class="btn btn-primary" onclick="selectSubject('all')">全教科</button>
+      <button class="btn btn-secondary" onclick="showHome()">戻る</button>
+    </div>
+
+    <!-- ジャンル選択画面 -->
+    <div id="genre-screen" class="screen">
+      <h1 id="genre-title">ジャンルを選択</h1>
+      <div id="genre-list" class="genre-grid"></div>
+      <button class="btn btn-primary" onclick="startQuiz()">全ジャンル</button>
+      <button class="btn btn-secondary" onclick="showSubjects()">戻る</button>
+    </div>
+
+    <!-- クイズ画面 -->
+    <div id="quiz-screen" class="screen">
+      <div class="timer" id="timer">3:00</div>
+      <div class="progress" id="progress">1 / 10</div>
+      <div class="question-text" id="question-text"></div>
+      <div id="choices"></div>
+    </div>
+
+    <!-- 結果画面 -->
+    <div id="result-screen" class="screen">
+      <h1>結果</h1>
+      <div class="stats-card" style="text-align: center;">
+        <div class="stats-value" id="result-score">8/10</div>
+        <div>正答率: <span id="result-accuracy">80</span>%</div>
+      </div>
+      <button class="btn btn-primary" onclick="showHome()">ホームへ</button>
+    </div>
+
+  </div>
+
+  <script>
+    // ===========================================
+    // 状態管理
+    // ===========================================
+    let currentUser = null;
+    let currentSubject = null;
+    let currentGenre = null;
+    let questions = [];
+    let currentIndex = 0;
+    let answers = [];
+    let timerInterval = null;
+    let timeRemaining = 0;
+
+    // ===========================================
+    // 画面遷移
+    // ===========================================
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    function showHome() {
+      loadStats();
+      showScreen('home-screen');
+    }
+
+    function showSubjects() {
+      showScreen('subject-screen');
+    }
+
+    // ===========================================
+    // 認証
+    // ===========================================
+    function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      // TODO: GAS API呼び出し
+      google.script.run
+        .withSuccessHandler(result => {
+          if (result.success) {
+            currentUser = result.user;
+            showHome();
+          } else {
+            alert(result.error);
+          }
+        })
+        .doPost({ action: 'login', username, password });
+    }
+
+    // ===========================================
+    // 教科・ジャンル選択
+    // ===========================================
+    function selectSubject(subject) {
+      currentSubject = subject;
+
+      if (subject === 'all') {
+        startQuiz();
+        return;
+      }
+
+      // ジャンル一覧を取得
+      google.script.run
+        .withSuccessHandler(result => {
+          if (result.success) {
+            renderGenres(result.genres);
+            showScreen('genre-screen');
+          }
+        })
+        .doPost({ action: 'get_genres', subject });
+    }
+
+    function renderGenres(genres) {
+      const container = document.getElementById('genre-list');
+      container.innerHTML = genres.map(g => `
+        <button class="btn btn-secondary" onclick="selectGenre('${g.genre_id}')">
+          ${g.genre_name} (${g.count})
+        </button>
+      `).join('');
+    }
+
+    function selectGenre(genreId) {
+      currentGenre = genreId;
+      startQuiz();
+    }
+
+    // ===========================================
+    // クイズ
+    // ===========================================
+    function startQuiz() {
+      google.script.run
+        .withSuccessHandler(result => {
+          if (result.success) {
+            questions = result.questions;
+            timeRemaining = result.time_limit;
+            currentIndex = 0;
+            answers = [];
+            showScreen('quiz-screen');
+            renderQuestion();
+            startTimer();
+          }
+        })
+        .doPost({
+          action: 'get_questions',
+          subject: currentSubject,
+          genre_id: currentGenre,
+          count: 10
+        });
+    }
+
+    function renderQuestion() {
+      const q = questions[currentIndex];
+      document.getElementById('progress').textContent = `${currentIndex + 1} / ${questions.length}`;
+      document.getElementById('question-text').textContent = q.question_text;
+
+      const choicesHtml = q.choices.map((c, i) => `
+        <button class="btn btn-choice" onclick="selectAnswer(${i})">${c}</button>
+      `).join('');
+      document.getElementById('choices').innerHTML = choicesHtml;
+    }
+
+    function selectAnswer(index) {
+      const q = questions[currentIndex];
+      answers.push({
+        question_id: q.question_id,
+        genre_id: q.genre_id,
+        user_answer: index,
+        correct_index: q.correct_index
+      });
+
+      // 次の問題へ
+      currentIndex++;
+      if (currentIndex < questions.length) {
+        renderQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function startTimer() {
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        if (timeRemaining <= 0) {
+          finishQuiz();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const min = Math.floor(timeRemaining / 60);
+      const sec = timeRemaining % 60;
+      document.getElementById('timer').textContent =
+        `${min}:${sec.toString().padStart(2, '0')}`;
+    }
+
+    function finishQuiz() {
+      clearInterval(timerInterval);
+
+      google.script.run
+        .withSuccessHandler(result => {
+          document.getElementById('result-score').textContent =
+            `${result.correct_count}/${result.total}`;
+          document.getElementById('result-accuracy').textContent =
+            Math.round(result.accuracy * 100);
+          showScreen('result-screen');
+        })
+        .doPost({
+          action: 'submit_answers',
+          user_id: currentUser.user_id,
+          session_id: Date.now().toString(),
+          subject: currentSubject,
+          answers: answers,
+          time_remaining: timeRemaining
+        });
+    }
+
+    // ===========================================
+    // 統計
+    // ===========================================
+    function loadStats() {
+      if (!currentUser) return;
+
+      google.script.run
+        .withSuccessHandler(result => {
+          if (result.success) {
+            document.getElementById('total-questions').textContent =
+              result.stats.total_questions;
+            document.getElementById('accuracy').textContent =
+              Math.round(result.stats.overall_accuracy * 100);
+          }
+        })
+        .doPost({ action: 'get_stats', user_id: currentUser.user_id });
+    }
+
+    function showStats() {
+      // TODO: 詳細分析画面
+      alert('詳細分析は今後実装');
+    }
+  </script>
+</body>
+</html>

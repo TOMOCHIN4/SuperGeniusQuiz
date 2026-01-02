@@ -1,0 +1,21 @@
+// DashboardMetrics Component Styles
+
+.metrics {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$spacing-md;
+  padding: 0 v.$spacing-md;
+
+  @media (min-width: 600px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.card {
+  padding: v.$spacing-md;
+}
+
+.accuracyWrapper {
+  @include m.flex-center;
+  min-height: 160px;
+}

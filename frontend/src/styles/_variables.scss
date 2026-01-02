@@ -1,0 +1,119 @@
+// ===========================================
+// SuperGeniusQuiz - Design Tokens
+// Based on: docs/DEVEROPMENT.md v5.0
+// ===========================================
+
+// ------------------------------------------
+// Colors - Base
+// ------------------------------------------
+$white: #FFFFFF;
+$bg-white: #F5F7FA;
+$card-white: #FFFFFF;
+$text-primary: #333333;
+$text-secondary: #666666;
+$brand-blue: #007AFF;
+$brand-blue-hover: #0066D6;  // darken 8%
+$brand-purple: #764ba2;      // ログイン画面グラデーション用
+$text-secondary-hover: #525252;  // darken 8%
+$divider: #E0E0E0;
+$divider-dark: #C8C8C8;  // darken 10%
+
+// ------------------------------------------
+// Gradients (Charts)
+// ------------------------------------------
+$grad-chart-blue: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+$grad-chart-teal: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+
+// ------------------------------------------
+// Colors - Subject (教科カラー)
+// ------------------------------------------
+$subject-jp: #4A90E2;     // 国語
+$subject-math: #50C878;   // 算数
+$subject-sci: #00A896;    // 理科
+$subject-soc: #FF6B6B;    // 社会
+
+// ------------------------------------------
+// Colors - Feedback
+// ------------------------------------------
+$color-success: #34C759;
+$color-error: #FF3B30;
+$color-warning: #FF9500;
+
+// Alias
+$success: $color-success;
+$error: $color-error;
+$warning: $color-warning;
+
+// ------------------------------------------
+// Typography
+// ------------------------------------------
+$font-family-base: 'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+$font-family-accent: 'Outfit', 'Noto Sans JP', sans-serif;
+
+$font-size-xs: 0.75rem;   // 12px
+$font-size-sm: 0.875rem;  // 14px
+$font-size-base: 1rem;    // 16px
+$font-size-lg: 1.125rem;  // 18px
+$font-size-xl: 1.25rem;   // 20px
+$font-size-2xl: 1.5rem;   // 24px
+$font-size-3xl: 2rem;     // 32px
+
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 700;
+
+$line-height-tight: 1.25;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.75;
+
+// ------------------------------------------
+// Spacing
+// ------------------------------------------
+$spacing-xs: 0.25rem;   // 4px
+$spacing-sm: 0.5rem;    // 8px
+$spacing-md: 1rem;      // 16px
+$spacing-lg: 1.5rem;    // 24px
+$spacing-xl: 2rem;      // 32px
+$spacing-2xl: 3rem;     // 48px
+
+// ------------------------------------------
+// Border Radius
+// ------------------------------------------
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+$radius-full: 9999px;
+
+// ------------------------------------------
+// Shadows
+// ------------------------------------------
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+$shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+// ------------------------------------------
+// Transitions
+// ------------------------------------------
+$transition-fast: 150ms ease;
+$transition-normal: 250ms ease;
+$transition-slow: 350ms ease;
+
+// ------------------------------------------
+// Breakpoints
+// ------------------------------------------
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+
+// ------------------------------------------
+// Z-Index
+// ------------------------------------------
+$z-dropdown: 100;
+$z-sticky: 200;
+$z-fixed: 300;
+$z-modal-backdrop: 400;
+$z-modal: 500;
+$z-tooltip: 600;

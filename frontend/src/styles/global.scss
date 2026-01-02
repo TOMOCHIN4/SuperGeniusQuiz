@@ -1,0 +1,113 @@
+// ===========================================
+// SuperGeniusQuiz - Global Styles
+// ===========================================
+
+// Note: v (variables) and m (mixins) are auto-imported via vite.config.ts
+
+// ------------------------------------------
+// CSS Reset / Base
+// ------------------------------------------
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-normal;
+  line-height: v.$line-height-normal;
+  color: v.$text-primary;
+  background-color: v.$bg-white;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ------------------------------------------
+// Typography Defaults
+// ------------------------------------------
+h1, h2, h3, h4, h5, h6 {
+  font-weight: v.$font-weight-bold;
+  line-height: v.$line-height-tight;
+}
+
+h1 {
+  font-size: v.$font-size-3xl;
+}
+
+h2 {
+  font-size: v.$font-size-2xl;
+}
+
+h3 {
+  font-size: v.$font-size-xl;
+}
+
+p {
+  margin-bottom: v.$spacing-md;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// ------------------------------------------
+// Links
+// ------------------------------------------
+a {
+  color: v.$brand-blue;
+  text-decoration: none;
+  transition: color v.$transition-fast;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// ------------------------------------------
+// Images
+// ------------------------------------------
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+// ------------------------------------------
+// Buttons (Reset)
+// ------------------------------------------
+button {
+  @include m.button-reset;
+  @include m.focus-ring;
+}
+
+// ------------------------------------------
+// Lists
+// ------------------------------------------
+ul, ol {
+  list-style: none;
+}
+
+// ------------------------------------------
+// Root Container
+// ------------------------------------------
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+// ------------------------------------------
+// Utility Classes
+// ------------------------------------------
+.visually-hidden {
+  @include m.visually-hidden;
+}

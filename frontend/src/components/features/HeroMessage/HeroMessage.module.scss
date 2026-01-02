@@ -1,0 +1,18 @@
+// HeroMessage Component Styles
+
+.hero {
+  padding: v.$spacing-lg v.$spacing-md;
+  text-align: center;
+}
+
+.message {
+  margin: 0;
+  font-size: v.$font-size-2xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+  line-height: 1.4;
+
+  @media (min-width: 768px) {
+    font-size: 28px;
+  }
+}

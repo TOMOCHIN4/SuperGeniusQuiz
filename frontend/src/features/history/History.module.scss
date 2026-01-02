@@ -1,0 +1,73 @@
+// History Page Styles
+
+.container {
+  @include m.flex-column;
+  gap: v.$spacing-md;
+  padding: v.$spacing-md;
+  padding-bottom: v.$spacing-xl;
+}
+
+.title {
+  margin: 0;
+  font-size: v.$font-size-xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+}
+
+.list {
+  @include m.flex-column;
+  gap: v.$spacing-sm;
+}
+
+.historyCard {
+  padding: v.$spacing-md;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: v.$spacing-sm;
+}
+
+.subjectBadge {
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
+  color: v.$white;
+  padding: v.$spacing-xs v.$spacing-sm;
+  border-radius: v.$radius-full;
+}
+
+.date {
+  font-size: v.$font-size-sm;
+  color: v.$text-secondary;
+}
+
+.scoreArea {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: v.$spacing-sm;
+}
+
+.score {
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-medium;
+  color: v.$text-primary;
+}
+
+.percentage {
+  font-size: v.$font-size-lg;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+}
+
+.emptyCard {
+  padding: v.$spacing-xl;
+  text-align: center;
+}
+
+.emptyText {
+  margin: 0;
+  color: v.$text-secondary;
+}

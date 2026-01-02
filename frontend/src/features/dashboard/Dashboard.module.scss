@@ -1,0 +1,28 @@
+// Dashboard Page Styles
+
+.container {
+  @include m.flex-column;
+  gap: v.$spacing-lg;
+  padding-bottom: v.$spacing-xl;
+}
+
+.subjects {
+  padding: 0 v.$spacing-md;
+}
+
+.sectionTitle {
+  font-size: v.$font-size-lg;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+  margin: 0 0 v.$spacing-md 0;
+}
+
+.subjectGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: v.$spacing-md;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

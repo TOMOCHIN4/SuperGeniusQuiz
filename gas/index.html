@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>超天才クイズ v4</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .screen {
+      display: none;
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    .screen.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 24px;
+      text-align: center;
+      color: #333;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #e0e0e0;
+    }
+
+    .btn-subject {
+      background: white;
+      border: 2px solid #ddd;
+      color: #333;
+    }
+
+    .btn-subject:hover {
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+
+    .btn-choice {
+      background: white;
+      border: 2px solid #ddd;
+      text-align: left;
+      padding: 16px 20px;
+    }
+
+    .btn-choice:hover:not(:disabled) {
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+
+    .btn-choice.correct {
+      border-color: #4CAF50;
+      background: #e8f5e9;
+    }
+
+    .btn-choice.wrong {
+      border-color: #f44336;
+      background: #ffebee;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      margin: 8px 0;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      font-size: 16px;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .timer {
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+      color: #667eea;
+      margin: 16px 0;
+    }
+
+    .timer.warning {
+      color: #ff9800;
+    }
+
+    .timer.danger {
+      color: #f44336;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .progress {
+      text-align: center;
+      color: #666;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    .question-text {
+      font-size: 18px;
+      line-height: 1.8;
+      margin-bottom: 24px;
+      color: #333;
+    }
+
+    .stats-card {
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 16px 0;
+      text-align: center;
+    }
+
+    .stats-value {
+      font-size: 48px;
+      font-weight: bold;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stats-label {
+      color: #666;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .genre-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+
+    .error {
+      background: #ffebee;
+      color: #c62828;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 8px 0;
+      text-align: center;
+    }
+
+    .subject-icon {
+      font-size: 24px;
+      margin-right: 8px;
+    }
+
+    .hint-box {
+      background: #fff3e0;
+      border-left: 4px solid #ff9800;
+      padding: 12px;
+      margin-top: 16px;
+      border-radius: 0 8px 8px 0;
+      font-size: 14px;
+      color: #e65100;
+    }
+
+    .result-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .result-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 16px;
+    }
+
+    .result-icon.correct {
+      background: #e8f5e9;
+      color: #4CAF50;
+    }
+
+    .result-icon.wrong {
+      background: #ffebee;
+      color: #f44336;
+    }
+
+    .import-card {
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border-left: 4px solid #4CAF50;
+    }
+
+    .import-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .import-card-date {
+      font-size: 14px;
+      color: #2e7d32;
+      font-weight: 600;
+    }
+
+    .import-card-count {
+      background: #4CAF50;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .import-card-subjects {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .import-card-btn {
+      display: inline-block;
+      background: #4CAF50;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .import-card-btn:hover {
+      background: #388e3c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- ログイン画面 -->
+    <div id="login-screen" class="screen active">
+      <h1>超天才クイズ</h1>
+      <input type="text" id="username" placeholder="ユーザー名">
+      <input type="password" id="password" placeholder="パスワード">
+      <div id="login-error" class="error" style="display:none;"></div>
+      <button class="btn btn-primary" onclick="login()" id="login-btn">ログイン</button>
+    </div>
+
+    <!-- ホーム画面 -->
+    <div id="home-screen" class="screen">
+      <h1 id="welcome-msg">ようこそ！</h1>
+      <div class="stats-card">
+        <div class="stats-value" id="home-accuracy">--%</div>
+        <div class="stats-label">正答率</div>
+        <div style="margin-top:8px;color:#666;">
+          解答数: <span id="home-total">0</span>問
+        </div>
+      </div>
+
+      <!-- 新着問題セクション -->
+      <div id="recent-imports-section" style="display:none; margin: 16px 0;">
+        <h3 style="font-size:16px; color:#333; margin-bottom:12px;">
+          最近追加された問題
+        </h3>
+        <div id="recent-imports-list"></div>
+      </div>
+
+      <button class="btn btn-primary" onclick="showSubjects()">
+        クイズを始める
+      </button>
+      <button class="btn btn-secondary" onclick="logout()">ログアウト</button>
+    </div>
+
+    <!-- 教科選択画面 -->
+    <div id="subject-screen" class="screen">
+      <h1>教科を選択</h1>
+      <button class="btn btn-subject" onclick="selectSubject('jp')">
+        <span class="subject-icon">📚</span>国語
+      </button>
+      <button class="btn btn-subject" onclick="selectSubject('math')">
+        <span class="subject-icon">🔢</span>算数
+      </button>
+      <button class="btn btn-subject" onclick="selectSubject('sci')">
+        <span class="subject-icon">🔬</span>理科
+      </button>
+      <button class="btn btn-subject" onclick="selectSubject('soc')">
+        <span class="subject-icon">🌍</span>社会
+      </button>
+      <button class="btn btn-primary" onclick="selectSubject('all')">
+        <span class="subject-icon">🎯</span>全教科ミックス
+      </button>
+      <button class="btn btn-secondary" onclick="showHome()">戻る</button>
+    </div>
+
+    <!-- ジャンル選択画面 -->
+    <div id="genre-screen" class="screen">
+      <h1 id="genre-title">ジャンルを選択</h1>
+      <div id="genre-list" class="genre-grid"></div>
+      <button class="btn btn-primary" onclick="startQuiz()">全ジャンルから出題</button>
+      <button class="btn btn-secondary" onclick="showSubjects()">戻る</button>
+    </div>
+
+    <!-- クイズ画面 -->
+    <div id="quiz-screen" class="screen">
+      <div class="timer" id="timer">5:00</div>
+      <div class="progress" id="progress">1 / 10</div>
+      <div class="question-text" id="question-text"></div>
+      <div id="choices"></div>
+    </div>
+
+    <!-- 結果画面 -->
+    <div id="result-screen" class="screen">
+      <h1>結果発表</h1>
+      <div class="stats-card">
+        <div class="stats-value" id="result-score">0/0</div>
+        <div class="stats-label">正解数</div>
+      </div>
+      <div id="result-detail"></div>
+      <button class="btn btn-primary" onclick="showSubjects()">もう一度</button>
+      <button class="btn btn-secondary" onclick="showHome()">ホームへ</button>
+    </div>
+
+  </div>
+
+  <script>
+    // ===========================================
+    // 状態管理
+    // ===========================================
+    let currentUser = null;
+    let currentSubject = null;
+    let currentGenre = null;
+    let currentBatchId = null;  // 新着問題用
+    let questions = [];
+    let currentIndex = 0;
+    let answers = [];
+    let timerInterval = null;
+    let timeRemaining = 0;
+
+    // ===========================================
+    // API通信
+    // ===========================================
+    function callApi(params) {
+      return new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler(reject)
+          .doPost({ postData: { contents: JSON.stringify(params) } });
+      });
+    }
+
+    // 内部関数として直接呼び出す方式に変更
+    function callApiDirect(action, params) {
+      return new Promise((resolve, reject) => {
+        const fullParams = { action, ...params };
+        google.script.run
+          .withSuccessHandler(result => {
+            if (typeof result === 'string') {
+              try {
+                resolve(JSON.parse(result));
+              } catch (e) {
+                resolve(result);
+              }
+            } else {
+              resolve(result);
+            }
+          })
+          .withFailureHandler(reject)
+          .processAction(fullParams);
+      });
+    }
+
+    // ===========================================
+    // 画面遷移
+    // ===========================================
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    function showHome() {
+      loadStats();
+      loadRecentImports();
+      showScreen('home-screen');
+    }
+
+    function showSubjects() {
+      showScreen('subject-screen');
+    }
+
+    // ===========================================
+    // 認証
+    // ===========================================
+    async function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const errorDiv = document.getElementById('login-error');
+      const btn = document.getElementById('login-btn');
+
+      if (!username || !password) {
+        errorDiv.textContent = 'ユーザー名とパスワードを入力してください';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'ログイン中...';
+      errorDiv.style.display = 'none';
+
+      try {
+        const result = await callApiDirect('login', { username, password });
+        if (result.success) {
+          currentUser = result.user;
+          document.getElementById('welcome-msg').textContent =
+            `${currentUser.username}さん、ようこそ！`;
+          showHome();
+        } else {
+          errorDiv.textContent = result.error || 'ログインに失敗しました';
+          errorDiv.style.display = 'block';
+        }
+      } catch (e) {
+        errorDiv.textContent = 'エラーが発生しました: ' + e.message;
+        errorDiv.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'ログイン';
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+      showScreen('login-screen');
+    }
+
+    // ===========================================
+    // 教科・ジャンル選択
+    // ===========================================
+    async function selectSubject(subject) {
+      currentSubject = subject;
+      currentGenre = null;
+
+      if (subject === 'all') {
+        startQuiz();
+        return;
+      }
+
+      try {
+        const result = await callApiDirect('get_genres', { subject });
+        if (result.success && result.genres.length > 0) {
+          renderGenres(result.genres);
+          const titles = {
+            jp: '国語',
+            math: '算数',
+            sci: '理科',
+            soc: '社会'
+          };
+          document.getElementById('genre-title').textContent =
+            titles[subject] + 'のジャンル';
+          showScreen('genre-screen');
+        } else {
+          startQuiz();
+        }
+      } catch (e) {
+        console.error(e);
+        startQuiz();
+      }
+    }
+
+    function renderGenres(genres) {
+      const container = document.getElementById('genre-list');
+      container.innerHTML = genres.map(g => `
+        <button class="btn btn-secondary" onclick="selectGenre('${g.genre_id}')">
+          ${g.genre_name}<br><small>(${g.count}問)</small>
+        </button>
+      `).join('');
+    }
+
+    function selectGenre(genreId) {
+      currentGenre = genreId;
+      startQuiz();
+    }
+
+    // ===========================================
+    // クイズ
+    // ===========================================
+    async function startQuiz(batchId = null) {
+      showScreen('quiz-screen');
+      document.getElementById('question-text').textContent = '読み込み中...';
+      document.getElementById('choices').innerHTML = '';
+
+      // バッチ指定がある場合は保存
+      currentBatchId = batchId;
+
+      try {
+        const params = {
+          subject: currentSubject || 'all',
+          genre_id: currentGenre,
+          count: 10
+        };
+        // バッチ指定がある場合は追加
+        if (batchId) {
+          params.batch_id = batchId;
+        }
+
+        const result = await callApiDirect('get_questions', params);
+
+        if (result.success && result.questions.length > 0) {
+          questions = result.questions;
+          timeRemaining = result.time_limit;
+          currentIndex = 0;
+          answers = [];
+          renderQuestion();
+          startTimer();
+        } else {
+          document.getElementById('question-text').textContent =
+            '問題が見つかりませんでした';
+          setTimeout(() => showSubjects(), 2000);
+        }
+      } catch (e) {
+        document.getElementById('question-text').textContent =
+          'エラー: ' + e.message;
+        setTimeout(() => showSubjects(), 2000);
+      }
+    }
+
+    function renderQuestion() {
+      const q = questions[currentIndex];
+      document.getElementById('progress').textContent =
+        `${currentIndex + 1} / ${questions.length}`;
+      document.getElementById('question-text').textContent = q.question_text;
+
+      const choicesHtml = q.choices.map((c, i) => `
+        <button class="btn btn-choice" onclick="selectAnswer(${i})" id="choice-${i}">
+          ${c}
+        </button>
+      `).join('');
+      document.getElementById('choices').innerHTML = choicesHtml;
+    }
+
+    function selectAnswer(index) {
+      const q = questions[currentIndex];
+
+      // 正解・不正解の表示
+      const buttons = document.querySelectorAll('.btn-choice');
+      buttons.forEach((btn, i) => {
+        btn.disabled = true;
+        if (i === q.correct_index) {
+          btn.classList.add('correct');
+        } else if (i === index && i !== q.correct_index) {
+          btn.classList.add('wrong');
+        }
+      });
+
+      answers.push({
+        question_id: q.question_id,
+        genre_id: q.genre_id,
+        user_answer: index,
+        correct_index: q.correct_index,
+        question_text: q.question_text,
+        choices: q.choices
+      });
+
+      // 少し待ってから次の問題へ
+      setTimeout(() => {
+        currentIndex++;
+        if (currentIndex < questions.length) {
+          renderQuestion();
+        } else {
+          finishQuiz();
+        }
+      }, 800);
+    }
+
+    function startTimer() {
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        if (timeRemaining <= 0) {
+          finishQuiz();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const timerEl = document.getElementById('timer');
+      const min = Math.floor(timeRemaining / 60);
+      const sec = timeRemaining % 60;
+      timerEl.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+
+      timerEl.classList.remove('warning', 'danger');
+      if (timeRemaining <= 30) {
+        timerEl.classList.add('danger');
+      } else if (timeRemaining <= 60) {
+        timerEl.classList.add('warning');
+      }
+    }
+
+    async function finishQuiz() {
+      clearInterval(timerInterval);
+
+      try {
+        const result = await callApiDirect('submit_answers', {
+          user_id: currentUser.user_id,
+          session_id: Date.now().toString(),
+          subject: currentSubject,
+          answers: answers,
+          time_remaining: timeRemaining
+        });
+
+        // 結果表示
+        document.getElementById('result-score').textContent =
+          `${result.correct_count}/${result.total}`;
+
+        // 詳細結果
+        const detailHtml = answers.map((ans, i) => {
+          const isCorrect = ans.user_answer === ans.correct_index;
+          return `
+            <div class="result-item">
+              <div class="result-icon ${isCorrect ? 'correct' : 'wrong'}">
+                ${isCorrect ? '○' : '×'}
+              </div>
+              <div>
+                <div style="font-size:14px;color:#666;">問${i + 1}</div>
+                <div style="font-size:12px;color:#999;">
+                  ${isCorrect ? '正解！' : '正解: ' + ans.choices[ans.correct_index]}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+        document.getElementById('result-detail').innerHTML = detailHtml;
+
+        showScreen('result-screen');
+      } catch (e) {
+        console.error(e);
+        alert('結果の保存に失敗しました');
+        showHome();
+      }
+    }
+
+    // ===========================================
+    // 統計
+    // ===========================================
+    async function loadStats() {
+      if (!currentUser) return;
+
+      try {
+        const result = await callApiDirect('get_stats', {
+          user_id: currentUser.user_id
+        });
+
+        if (result.success) {
+          document.getElementById('home-total').textContent =
+            result.stats.total_questions;
+          document.getElementById('home-accuracy').textContent =
+            Math.round(result.stats.overall_accuracy * 100) + '%';
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // ===========================================
+    // 新着問題
+    // ===========================================
+    async function loadRecentImports() {
+      try {
+        const result = await callApiDirect('get_recent_imports', { limit: 5 });
+
+        if (result.success && result.imports && result.imports.length > 0) {
+          renderRecentImports(result.imports);
+          document.getElementById('recent-imports-section').style.display = 'block';
+        } else {
+          document.getElementById('recent-imports-section').style.display = 'none';
+        }
+      } catch (e) {
+        console.error('新着問題の取得に失敗:', e);
+        document.getElementById('recent-imports-section').style.display = 'none';
+      }
+    }
+
+    function renderRecentImports(imports) {
+      const subjectNames = {
+        jp: '国語',
+        math: '算数',
+        sci: '理科',
+        soc: '社会'
+      };
+
+      const html = imports.map(imp => {
+        // 日時をフォーマット
+        const date = new Date(imp.created_at);
+        const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+
+        // 教科内訳
+        const subjectsStr = imp.subjects
+          .map(s => `${subjectNames[s.subject] || s.subject}(${s.count})`)
+          .join(' ');
+
+        return `
+          <div class="import-card">
+            <div class="import-card-header">
+              <span class="import-card-date">${dateStr}</span>
+              <span class="import-card-count">${imp.count}問追加</span>
+            </div>
+            <div class="import-card-subjects">${subjectsStr}</div>
+            <button class="import-card-btn" onclick="startQuizWithBatch('${imp.batch_id}')">
+              この問題で挑戦
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('recent-imports-list').innerHTML = html;
+    }
+
+    function startQuizWithBatch(batchId) {
+      currentSubject = 'all';  // バッチ内の全教科から出題
+      currentGenre = null;
+      startQuiz(batchId);
+    }
+
+    // Enterキーでログイン
+    document.getElementById('password').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') login();
+    });
+  </script>
+</body>
+</html>

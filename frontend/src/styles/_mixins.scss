@@ -1,0 +1,131 @@
+// ===========================================
+// SuperGeniusQuiz - SCSS Mixins
+// ===========================================
+
+@use './variables' as v;
+
+// ------------------------------------------
+// Breakpoint Mixins
+// ------------------------------------------
+@mixin sm {
+  @media (min-width: v.$breakpoint-sm) {
+    @content;
+  }
+}
+
+@mixin md {
+  @media (min-width: v.$breakpoint-md) {
+    @content;
+  }
+}
+
+@mixin lg {
+  @media (min-width: v.$breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin xl {
+  @media (min-width: v.$breakpoint-xl) {
+    @content;
+  }
+}
+
+// ------------------------------------------
+// Flexbox Helpers
+// ------------------------------------------
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// ------------------------------------------
+// Typography
+// ------------------------------------------
+@mixin text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin text-clamp($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// ------------------------------------------
+// Card Style
+// ------------------------------------------
+@mixin card {
+  background-color: v.$card-white;
+  border-radius: v.$radius-lg;
+  box-shadow: v.$shadow-card;
+}
+
+@mixin card-interactive {
+  @include card;
+  cursor: pointer;
+  transition: transform v.$transition-fast, box-shadow v.$transition-fast;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: v.$shadow-md;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// ------------------------------------------
+// Button Base
+// ------------------------------------------
+@mixin button-reset {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: none;
+}
+
+// ------------------------------------------
+// Focus Ring
+// ------------------------------------------
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 2px solid v.$brand-blue;
+    outline-offset: 2px;
+  }
+}
+
+// ------------------------------------------
+// Visually Hidden (a11y)
+// ------------------------------------------
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
