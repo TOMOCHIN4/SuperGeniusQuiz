@@ -198,6 +198,9 @@ function doPost(e) {
       case 'add_user':
         result = addUser(params);
         break;
+      case 'get_history':
+        result = getHistory(params);
+        break;
       default:
         result = { success: false, error: 'Unknown action: ' + action };
     }
@@ -509,6 +512,48 @@ function getStats(params) {
     : 0;
 
   return { success: true, stats: stats };
+}
+
+// ===========================================
+// 履歴取得
+// ===========================================
+
+function getHistory(params) {
+  const { user_id, limit = 20 } = params;
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sessionsSheet = ss.getSheetByName(SHEET_NAMES.SESSIONS);
+  const data = sessionsSheet.getDataRange().getValues();
+
+  // ヘッダー: session_id, user_id, subject, genre_id, total_questions, correct_count, time_limit, time_remaining, started_at, finished_at
+  const history = [];
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][1] === user_id) {
+      history.push({
+        session_id: data[i][0],
+        subject: data[i][2],
+        genre_id: data[i][3],
+        total_questions: data[i][4],
+        correct_count: data[i][5],
+        time_limit: data[i][6],
+        time_remaining: data[i][7],
+        started_at: data[i][8],
+        finished_at: data[i][9]
+      });
+    }
+  }
+
+  // 日付でソート（新しい順）
+  history.sort((a, b) => {
+    const dateA = new Date(a.finished_at || a.started_at);
+    const dateB = new Date(b.finished_at || b.started_at);
+    return dateB - dateA;
+  });
+
+  return {
+    success: true,
+    history: history.slice(0, limit)
+  };
 }
 
 // ===========================================

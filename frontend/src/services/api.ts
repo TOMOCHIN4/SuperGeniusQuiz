@@ -7,6 +7,7 @@ import type {
   SubmitAnswersResponse,
   GetStatsResponse,
   GetRecentImportsResponse,
+  GetHistoryResponse,
   Subject,
   AnswerData,
 } from '@/types';
@@ -129,6 +130,21 @@ export async function getRecentImports(
   });
 }
 
+// ========================================
+// 履歴取得 API
+// ========================================
+
+export async function getHistory(
+  userId: string,
+  limit: number = 20
+): Promise<GetHistoryResponse> {
+  return callApi<GetHistoryResponse>({
+    action: 'get_history',
+    user_id: userId,
+    limit,
+  });
+}
+
 // デフォルトエクスポート
 export const api = {
   login,
@@ -137,6 +153,7 @@ export const api = {
   submitAnswers,
   getStats,
   getRecentImports,
+  getHistory,
 };
 
 export default api;

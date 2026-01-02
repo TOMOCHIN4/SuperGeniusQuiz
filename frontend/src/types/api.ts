@@ -165,6 +165,34 @@ export interface GetRecentImportsResponse {
 }
 
 // ========================================
+// 履歴
+// ========================================
+
+export interface HistoryItem {
+  session_id: string;
+  subject: Subject;
+  genre_id: string;
+  total_questions: number;
+  correct_count: number;
+  time_limit: number;
+  time_remaining: number;
+  started_at: string;
+  finished_at: string;
+}
+
+export interface GetHistoryRequest {
+  action: 'get_history';
+  user_id: string;
+  limit?: number;
+}
+
+export interface GetHistoryResponse {
+  success: boolean;
+  history: HistoryItem[];
+  error?: string;
+}
+
+// ========================================
 // API リクエスト全般
 // ========================================
 
@@ -174,4 +202,5 @@ export type ApiRequest =
   | GetGenresRequest
   | SubmitAnswersRequest
   | GetStatsRequest
-  | GetRecentImportsRequest;
+  | GetRecentImportsRequest
+  | GetHistoryRequest;
