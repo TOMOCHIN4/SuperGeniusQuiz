@@ -5,8 +5,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button, Card, ProgressBar, Loading } from '@/components/ui';
 import { useAuth } from '@/contexts';
-import { getQuestions, submitAnswers } from '@/services/api';
-import type { Question, Subject, AnswerData } from '@/types';
+import { getQuestions, getBookQuestions, submitAnswers } from '@/services/api';
+import type { Question, Subject, AnswerData, BookQuestion } from '@/types';
 import styles from './Quiz.module.scss';
 
 // 教科名マッピング
@@ -18,14 +18,27 @@ const SUBJECT_NAMES: Record<Subject, string> = {
   all: '全教科',
 };
 
+// 統一された問題型（QuestionとBookQuestionを統合）
+type UnifiedQuestion = (Question | BookQuestion) & {
+  genre_id?: string;
+  genre_name?: string;
+  book_id?: string;
+};
+
 export const Quiz: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  // パラメータ取得
+  const bookId = searchParams.get('book_id');
   const subject = (searchParams.get('subject') as Subject) || 'all';
 
+  // 参考書名を抽出（book_idから）
+  const bookTitle = bookId ? bookId.replace(/^(jp|math|sci|soc)_/, '') : null;
+
   // 問題データ
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<UnifiedQuestion[]>([]);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -49,13 +62,26 @@ export const Quiz: React.FC = () => {
       setLoadError(null);
 
       try {
-        const response = await getQuestions(subject, { count: 10 });
-        if (response.success && response.questions.length > 0) {
-          setQuestions(response.questions);
-          setTimeLeft(response.time_limit);
-          timeLimitRef.current = response.time_limit;
+        // book_idがある場合は参考書から問題取得
+        if (bookId) {
+          const response = await getBookQuestions(bookId, 10);
+          if (response.success && response.questions.length > 0) {
+            setQuestions(response.questions);
+            setTimeLeft(response.time_limit);
+            timeLimitRef.current = response.time_limit;
+          } else {
+            setLoadError(response.error || '問題が見つかりませんでした');
+          }
         } else {
-          setLoadError('問題が見つかりませんでした');
+          // 従来の教科別問題取得
+          const response = await getQuestions(subject, { count: 10 });
+          if (response.success && response.questions.length > 0) {
+            setQuestions(response.questions);
+            setTimeLeft(response.time_limit);
+            timeLimitRef.current = response.time_limit;
+          } else {
+            setLoadError('問題が見つかりませんでした');
+          }
         }
       } catch (error) {
         console.error('Failed to fetch questions:', error);
@@ -66,7 +92,7 @@ export const Quiz: React.FC = () => {
     };
 
     fetchQuestions();
-  }, [subject]);
+  }, [subject, bookId]);
 
   const currentQuestion = questions[currentIndex];
   const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
@@ -107,7 +133,7 @@ export const Quiz: React.FC = () => {
       // 回答データを記録
       answersRef.current.push({
         question_id: currentQuestion.question_id,
-        genre_id: currentQuestion.genre_id,
+        genre_id: currentQuestion.genre_id || currentQuestion.book_id || 'unknown',
         user_answer: choiceIndex,
         correct_index: currentQuestion.correct_index,
         question_text: currentQuestion.question_text,
@@ -205,7 +231,9 @@ export const Quiz: React.FC = () => {
     <div className={styles.container}>
       {/* ヘッダー情報 */}
       <div className={styles.header}>
-        <span className={styles.subject}>{SUBJECT_NAMES[subject]}</span>
+        <span className={styles.subject}>
+          {bookTitle ? bookTitle : SUBJECT_NAMES[subject]}
+        </span>
         <span className={styles.progress}>
           {currentIndex + 1} / {questions.length}
         </span>

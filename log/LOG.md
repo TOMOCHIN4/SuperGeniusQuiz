@@ -2,6 +2,112 @@
 
 ---
 
+### 2026-01-02 - Phase 5 参考書ベースUI 実装完了 ✅
+
+#### 実施作業
+フロントエンドに参考書選択画面を実装し、参考書ベースクイズのフロー完成
+
+| 項目 | 内容 |
+|------|------|
+| **型定義追加** | Book, BookQuestion, GetBooksResponse, GetBookQuestionsResponse |
+| **API関数追加** | getBooks(), getBookQuestions() |
+| **BookSelectページ** | 参考書一覧表示、教科フィルタ、クイズ開始 |
+| **ルーティング更新** | /books ルート追加 |
+| **Dashboard修正** | 教科クリック → /books?subject= へ遷移 |
+| **Quiz修正** | book_idパラメータ対応、getBookQuestions連携 |
+
+#### 新しい画面遷移フロー
+```
+Dashboard（教科選択）
+    ↓ 国語クリック
+/books?subject=jp（参考書選択）
+    ↓ 参考書クリック
+/quiz?book_id=jp_参考書名（クイズ）
+    ↓
+Result（結果）
+```
+
+#### 作成ファイル
+```
+frontend/src/features/books/
+├── BookSelect.tsx        # 参考書選択画面
+├── BookSelect.module.scss # スタイル
+└── index.ts              # エクスポート
+```
+
+#### 変更ファイル
+- `types/api.ts` - Book関連型追加
+- `services/api.ts` - getBooks, getBookQuestions追加
+- `App.tsx` - /booksルート追加、BookSelectインポート
+- `features/dashboard/Dashboard.tsx` - /booksへ遷移
+- `features/quiz/Quiz.tsx` - book_id対応、UnifiedQuestion型
+
+#### 品質ゲート
+- ✅ TypeScript型チェック成功
+- ✅ Viteビルド成功（dist/出力確認）
+
+#### ステータス
+- ✅ フロントエンド実装完了
+- 🔲 動作確認・Vercelデプロイ（次）
+
+#### 次回開始時の指針
+- ローカルで動作確認（npm run dev）
+- Vercelにデプロイ
+- テスト用参考書（jp_テスト参考書）で動作テスト
+
+---
+
+### 2026-01-02 - Phase 5 参考書ベースGAS API 完了 ✅
+
+#### 実施作業
+参考書ベースの出題システムのGAS API側を実装完了
+
+| API | 機能 | 状態 |
+|-----|------|------|
+| **create_book** | 参考書シート作成（usage_count列付き） | ✅ |
+| **get_books** | 参考書一覧取得（シート名自動認識） | ✅ |
+| **get_book_questions** | 問題取得（usage_count考慮、少ない順優先） | ✅ |
+
+#### 設計決定
+- **データ構造変更**: 教科→ジャンル→問題 から 教科→参考書→問題 へ
+- **シート命名規則**: `{教科コード}_{参考書名}` (例: `jp_漢字マスター3000`)
+- **教科コード**: jp(国語), math(算数), sci(理科), soc(社会)
+- **自動認識**: シート追加で自動的にUIに反映される設計
+- **出題優先度**: usage_countが少ない問題から優先的に出題
+
+#### 参考書シート構造
+| 列 | 内容 |
+|----|------|
+| question_id | 問題番号（自動採番） |
+| question_text | 問題文 |
+| choice_1〜4 | 選択肢 |
+| correct_index | 正解番号 |
+| hint | ヒント |
+| usage_count | 出題回数（自動更新） |
+
+#### テスト結果
+```
+1回目取得: ID 4, 1, 5 → usage_count 0→1 に更新
+2回目取得: ID 2, 3, 1 → 未出題の ID 2, 3 が優先！
+```
+
+#### 変更ファイル
+- `gas/コード.js` - create_book, get_books, get_book_questions 追加
+
+#### 品質ゲート
+- ✅ clasp push 成功
+- ✅ APIテスト成功（Python requests）
+
+#### ステータス
+- ✅ GAS API完了
+- 🔲 フロントエンド参考書選択画面（次）
+
+#### 次回開始時の指針
+- フロントエンドに参考書選択画面を実装
+- Dashboard → 教科選択 → 参考書選択 → クイズ のフロー
+
+---
+
 ### 2026-01-02 - Phase 4 GAS API連携 完了 ✅
 
 #### 実施作業

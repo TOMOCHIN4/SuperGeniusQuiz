@@ -196,6 +196,57 @@ export interface GetHistoryResponse {
 // API リクエスト全般
 // ========================================
 
+// ========================================
+// 参考書（Book）
+// ========================================
+
+export interface Book {
+  book_id: string;
+  subject: Subject;
+  title: string;
+  question_count: number;
+}
+
+export interface GetBooksRequest {
+  action: 'get_books';
+  subject?: Subject;
+}
+
+export interface GetBooksResponse {
+  success: boolean;
+  books: Book[];
+  total: number;
+  error?: string;
+}
+
+export interface BookQuestion {
+  question_id: string;
+  question_text: string;
+  choices: string[];
+  correct_index: number;
+  hint?: string;
+  book_id: string;
+  subject: Subject;
+}
+
+export interface GetBookQuestionsRequest {
+  action: 'get_book_questions';
+  book_id: string;
+  count?: number;
+}
+
+export interface GetBookQuestionsResponse {
+  success: boolean;
+  questions: BookQuestion[];
+  time_limit: number;
+  book_id: string;
+  error?: string;
+}
+
+// ========================================
+// API リクエスト全般
+// ========================================
+
 export type ApiRequest =
   | LoginRequest
   | GetQuestionsRequest
@@ -203,4 +254,6 @@ export type ApiRequest =
   | SubmitAnswersRequest
   | GetStatsRequest
   | GetRecentImportsRequest
-  | GetHistoryRequest;
+  | GetHistoryRequest
+  | GetBooksRequest
+  | GetBookQuestionsRequest;

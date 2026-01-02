@@ -56,7 +56,8 @@ export const Dashboard: React.FC = () => {
       science: 'sci',
       social: 'soc',
     };
-    navigate(`/quiz?subject=${subjectCodeMap[subject]}`);
+    // 参考書選択画面へ遷移
+    navigate(`/books?subject=${subjectCodeMap[subject]}`);
   };
 
   // 教科別の正答率を計算

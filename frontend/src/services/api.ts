@@ -8,6 +8,8 @@ import type {
   GetStatsResponse,
   GetRecentImportsResponse,
   GetHistoryResponse,
+  GetBooksResponse,
+  GetBookQuestionsResponse,
   Subject,
   AnswerData,
 } from '@/types';
@@ -145,6 +147,32 @@ export async function getHistory(
   });
 }
 
+// ========================================
+// 参考書取得 API
+// ========================================
+
+export async function getBooks(subject?: Subject): Promise<GetBooksResponse> {
+  return callApi<GetBooksResponse>({
+    action: 'get_books',
+    ...(subject && { subject }),
+  });
+}
+
+// ========================================
+// 参考書問題取得 API
+// ========================================
+
+export async function getBookQuestions(
+  bookId: string,
+  count: number = 10
+): Promise<GetBookQuestionsResponse> {
+  return callApi<GetBookQuestionsResponse>({
+    action: 'get_book_questions',
+    book_id: bookId,
+    count,
+  });
+}
+
 // デフォルトエクスポート
 export const api = {
   login,
@@ -154,6 +182,8 @@ export const api = {
   getStats,
   getRecentImports,
   getHistory,
+  getBooks,
+  getBookQuestions,
 };
 
 export default api;

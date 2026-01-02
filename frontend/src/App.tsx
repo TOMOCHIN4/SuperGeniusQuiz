@@ -3,6 +3,7 @@ import { Layout, AuthGuard } from '@/components/layout';
 import { AuthProvider } from '@/contexts';
 import { Login } from '@/features/login';
 import { Dashboard } from '@/features/dashboard';
+import { BookSelect } from '@/features/books';
 import { Quiz } from '@/features/quiz';
 import { Result } from '@/features/result';
 import { History } from '@/features/history';
@@ -25,6 +26,7 @@ function App() {
           }
         >
           <Route index element={<Dashboard />} />
+          <Route path="books" element={<BookSelect />} />
           <Route path="quiz" element={<Quiz />} />
           <Route path="result" element={<Result />} />
           <Route path="history" element={<History />} />

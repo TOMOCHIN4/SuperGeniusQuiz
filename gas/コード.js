@@ -201,6 +201,15 @@ function doPost(e) {
       case 'get_history':
         result = getHistory(params);
         break;
+      case 'create_book':
+        result = createBook(params);
+        break;
+      case 'get_books':
+        result = getBooks(params);
+        break;
+      case 'get_book_questions':
+        result = getBookQuestions(params);
+        break;
       default:
         result = { success: false, error: 'Unknown action: ' + action };
     }
@@ -867,4 +876,198 @@ function processAction(params) {
     default:
       return { success: false, error: 'Unknown action: ' + action };
   }
+}
+
+// ===========================================
+// 参考書管理（Book Management）
+// ===========================================
+
+/**
+ * 参考書シートを作成
+ * @param {Object} params - { subject: 'jp'|'math'|'sci'|'soc', title: '参考書名', questions?: [] }
+ */
+function createBook(params) {
+  const { subject, title, questions = [] } = params;
+
+  // バリデーション
+  const validSubjects = ['jp', 'math', 'sci', 'soc'];
+  if (!validSubjects.includes(subject)) {
+    return { success: false, error: `教科は ${validSubjects.join(', ')} のいずれかを指定してください` };
+  }
+  if (!title || title.trim() === '') {
+    return { success: false, error: '参考書名を指定してください' };
+  }
+
+  const sheetName = `${subject}_${title}`;
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+
+  // 既存シートチェック
+  if (ss.getSheetByName(sheetName)) {
+    return { success: false, error: `シート「${sheetName}」は既に存在します` };
+  }
+
+  // シート作成
+  const sheet = ss.insertSheet(sheetName);
+
+  // ヘッダー設定（usage_count追加）
+  const headers = ['question_id', 'question_text', 'choice_1', 'choice_2', 'choice_3', 'choice_4', 'correct_index', 'hint', 'usage_count'];
+  sheet.appendRow(headers);
+
+  // 問題データがあれば追加
+  let addedCount = 0;
+  if (questions && questions.length > 0) {
+    questions.forEach((q, index) => {
+      const questionId = index + 1;
+      sheet.appendRow([
+        questionId,
+        q.question_text || '',
+        q.choice_1 || q.choices?.[0] || '',
+        q.choice_2 || q.choices?.[1] || '',
+        q.choice_3 || q.choices?.[2] || '',
+        q.choice_4 || q.choices?.[3] || '',
+        q.correct_index ?? 1,
+        q.hint || '',
+        0  // usage_count 初期値
+      ]);
+      addedCount++;
+    });
+  }
+
+  Logger.log(`参考書「${sheetName}」を作成しました（問題数: ${addedCount}）`);
+
+  return {
+    success: true,
+    book_id: sheetName,
+    subject: subject,
+    title: title,
+    question_count: addedCount,
+    message: `参考書「${title}」を作成しました`
+  };
+}
+
+/**
+ * 参考書一覧を取得（シート名から自動認識）
+ * @param {Object} params - { subject?: 'jp'|'math'|'sci'|'soc' } 省略時は全教科
+ */
+function getBooks(params) {
+  const { subject } = params || {};
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheets = ss.getSheets();
+
+  const validSubjects = ['jp', 'math', 'sci', 'soc'];
+  const bookPattern = /^(jp|math|sci|soc)_(.+)$/;
+
+  const books = [];
+
+  sheets.forEach(sheet => {
+    const name = sheet.getName();
+    const match = name.match(bookPattern);
+
+    if (match) {
+      const bookSubject = match[1];
+      const bookTitle = match[2];
+
+      // 教科フィルタ
+      if (subject && bookSubject !== subject) {
+        return;
+      }
+
+      // 問題数をカウント（ヘッダー行を除く）
+      const lastRow = sheet.getLastRow();
+      const questionCount = lastRow > 1 ? lastRow - 1 : 0;
+
+      books.push({
+        book_id: name,
+        subject: bookSubject,
+        title: bookTitle,
+        question_count: questionCount
+      });
+    }
+  });
+
+  // タイトルでソート
+  books.sort((a, b) => a.title.localeCompare(b.title, 'ja'));
+
+  return {
+    success: true,
+    books: books,
+    total: books.length
+  };
+}
+
+/**
+ * 参考書から問題を取得（usage_count考慮）
+ * @param {Object} params - { book_id: 'jp_参考書名', count?: 10 }
+ */
+function getBookQuestions(params) {
+  const { book_id, count = 10 } = params;
+
+  if (!book_id) {
+    return { success: false, error: 'book_idを指定してください' };
+  }
+
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = ss.getSheetByName(book_id);
+
+  if (!sheet) {
+    return { success: false, error: `参考書「${book_id}」が見つかりません` };
+  }
+
+  const data = sheet.getDataRange().getValues();
+  if (data.length <= 1) {
+    return { success: false, error: '問題がありません' };
+  }
+
+  const headers = data[0];
+  const usageCountCol = headers.indexOf('usage_count');
+
+  // 問題データを取得
+  let questions = [];
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    questions.push({
+      row_index: i + 1,  // シート上の行番号（1-indexed）
+      question_id: row[0],
+      question_text: row[1],
+      choices: [row[2], row[3], row[4], row[5]],
+      correct_index: row[6],
+      hint: row[7] || '',
+      usage_count: usageCountCol >= 0 ? (row[usageCountCol] || 0) : 0
+    });
+  }
+
+  // usage_count でソートし、同一 usage_count 内はシャッフル
+  questions = sortByUsageCountWithShuffle(questions);
+
+  // 上位N問を選択
+  const selected = questions.slice(0, count);
+
+  // 選択した問題の usage_count を +1
+  if (usageCountCol >= 0 && selected.length > 0) {
+    selected.forEach(q => {
+      const currentValue = sheet.getRange(q.row_index, usageCountCol + 1).getValue() || 0;
+      sheet.getRange(q.row_index, usageCountCol + 1).setValue(currentValue + 1);
+    });
+  }
+
+  // book_id から subject を抽出
+  const match = book_id.match(/^(jp|math|sci|soc)_/);
+  const subject = match ? match[1] : 'all';
+
+  // row_index, usage_count を除去してクライアントに返す
+  const result = selected.map(q => {
+    const { row_index, usage_count, ...rest } = q;
+    return {
+      ...rest,
+      book_id: book_id,
+      subject: subject
+    };
+  });
+
+  return {
+    success: true,
+    questions: result,
+    time_limit: TIME_LIMITS[subject] || 180,
+    book_id: book_id
+  };
 }
