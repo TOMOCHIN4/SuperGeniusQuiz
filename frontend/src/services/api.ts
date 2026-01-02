@@ -14,7 +14,7 @@ import type {
 
 // GAS API エンドポイント
 const API_ENDPOINT =
-  'https://script.google.com/macros/s/AKfycbwlfAC4Zu1bPyXbu6hHpyNoOSZg4oaTpuIQF_qB_dqkJmdtnt72zzklIWQiYCmC12Tg/exec';
+  'https://script.google.com/macros/s/AKfycbwzRzBLo0D32sn5lI9vgvDsc7vmJW4VZ9_m1kM_he5iGPWF-CJ6steCcCGOFoTnxK3D/exec';
 
 // API通信の基本関数
 async function callApi<T>(params: Record<string, unknown>): Promise<T> {
