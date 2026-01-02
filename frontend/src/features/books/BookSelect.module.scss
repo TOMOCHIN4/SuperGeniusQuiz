@@ -106,6 +106,17 @@
   border-radius: v.$radius-sm;
 }
 
+.accuracy {
+  font-size: v.$font-size-sm;
+  color: v.$text-primary;
+  font-weight: v.$font-weight-bold;
+}
+
+.progressArea {
+  margin-top: v.$spacing-xs;
+  width: 100%;
+}
+
 .bookArrow {
   font-size: v.$font-size-xl;
   color: v.$divider;

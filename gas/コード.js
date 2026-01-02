@@ -947,15 +947,21 @@ function createBook(params) {
 
 /**
  * 参考書一覧を取得（シート名から自動認識）
- * @param {Object} params - { subject?: 'jp'|'math'|'sci'|'soc' } 省略時は全教科
+ * @param {Object} params - { subject?: 'jp'|'math'|'sci'|'soc', user_id?: string } 省略時は全教科
  */
 function getBooks(params) {
-  const { subject } = params || {};
+  const { subject, user_id } = params || {};
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   const sheets = ss.getSheets();
 
   const validSubjects = ['jp', 'math', 'sci', 'soc'];
   const bookPattern = /^(jp|math|sci|soc)_(.+)$/;
+
+  // user_idがある場合、参考書ごとの統計を計算
+  let bookStats = {};
+  if (user_id) {
+    bookStats = getBookStats(user_id);
+  }
 
   const books = [];
 
@@ -976,11 +982,17 @@ function getBooks(params) {
       const lastRow = sheet.getLastRow();
       const questionCount = lastRow > 1 ? lastRow - 1 : 0;
 
+      // 統計情報を追加
+      const stats = bookStats[name] || { total: 0, correct: 0, accuracy: 0 };
+
       books.push({
         book_id: name,
         subject: bookSubject,
         title: bookTitle,
-        question_count: questionCount
+        question_count: questionCount,
+        answered_count: stats.total,
+        correct_count: stats.correct,
+        accuracy: stats.accuracy
       });
     }
   });
@@ -993,6 +1005,44 @@ function getBooks(params) {
     books: books,
     total: books.length
   };
+}
+
+/**
+ * ユーザーの参考書ごとの統計を取得
+ * @param {string} user_id
+ * @returns {Object} { 'jp_参考書名': { total, correct, accuracy }, ... }
+ */
+function getBookStats(user_id) {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const answersSheet = ss.getSheetByName(SHEET_NAMES.ANSWERS);
+  const data = answersSheet.getDataRange().getValues();
+
+  // Answersシートの列: answer_id, user_id, session_id, question_id, subject, genre_id, user_answer, is_correct, time_taken, answered_at
+  const stats = {};
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][1] === user_id) {
+      const genreId = data[i][5];  // genre_id列にbook_idが入っている
+      const isCorrect = data[i][7];
+
+      // 参考書パターンにマッチする場合のみ集計
+      if (/^(jp|math|sci|soc)_/.test(genreId)) {
+        if (!stats[genreId]) {
+          stats[genreId] = { total: 0, correct: 0 };
+        }
+        stats[genreId].total++;
+        if (isCorrect) stats[genreId].correct++;
+      }
+    }
+  }
+
+  // 正答率を計算
+  Object.keys(stats).forEach(key => {
+    const s = stats[key];
+    s.accuracy = s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0;
+  });
+
+  return stats;
 }
 
 /**

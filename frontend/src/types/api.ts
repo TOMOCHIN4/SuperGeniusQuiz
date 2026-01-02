@@ -205,11 +205,15 @@ export interface Book {
   subject: Subject;
   title: string;
   question_count: number;
+  answered_count?: number;
+  correct_count?: number;
+  accuracy?: number;
 }
 
 export interface GetBooksRequest {
   action: 'get_books';
   subject?: Subject;
+  user_id?: string;
 }
 
 export interface GetBooksResponse {

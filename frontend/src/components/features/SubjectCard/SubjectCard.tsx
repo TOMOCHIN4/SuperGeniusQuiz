@@ -65,7 +65,7 @@ export const SubjectCard = ({
         <span className={styles.name}>{config.name}</span>
       </div>
       <div className={styles.progressArea}>
-        <span className={styles.progressLabel}>進捗: {progress}%</span>
+        <span className={styles.progressLabel}>正答率: {progress}%</span>
         <ProgressBar value={progress} color={config.color} size="sm" />
       </div>
     </Card>

@@ -3,7 +3,8 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Loading } from '@/components/ui';
+import { Card, Button, Loading, ProgressBar } from '@/components/ui';
+import { useAuth } from '@/contexts';
 import { getBooks } from '@/services/api';
 import type { Book, Subject } from '@/types';
 import styles from './BookSelect.module.scss';
@@ -29,6 +30,7 @@ const SUBJECT_COLORS: Record<Subject, string> = {
 export const BookSelect: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const subject = (searchParams.get('subject') as Subject) || 'all';
 
   const [books, setBooks] = useState<Book[]>([]);
@@ -41,7 +43,10 @@ export const BookSelect: React.FC = () => {
       setError(null);
 
       try {
-        const response = await getBooks(subject !== 'all' ? subject : undefined);
+        const response = await getBooks(
+          subject !== 'all' ? subject : undefined,
+          user?.user_id
+        );
         if (response.success) {
           // 指定教科のみフィルタ（allの場合は全て）
           const filtered = subject === 'all'
@@ -60,7 +65,7 @@ export const BookSelect: React.FC = () => {
     };
 
     fetchBooks();
-  }, [subject]);
+  }, [subject, user?.user_id]);
 
   const handleBookClick = (bookId: string) => {
     navigate(`/quiz?book_id=${encodeURIComponent(bookId)}`);
@@ -136,7 +141,21 @@ export const BookSelect: React.FC = () => {
                   <span className={styles.questionCount}>
                     {book.question_count}問
                   </span>
+                  {book.answered_count !== undefined && book.answered_count > 0 && (
+                    <span className={styles.accuracy}>
+                      正答率: {book.accuracy}%
+                    </span>
+                  )}
                 </div>
+                {book.answered_count !== undefined && book.answered_count > 0 && (
+                  <div className={styles.progressArea}>
+                    <ProgressBar
+                      value={book.accuracy || 0}
+                      color={SUBJECT_COLORS[book.subject]}
+                      size="sm"
+                    />
+                  </div>
+                )}
               </div>
               <div className={styles.bookArrow}>→</div>
             </Card>

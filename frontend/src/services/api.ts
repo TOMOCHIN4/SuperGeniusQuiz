@@ -151,10 +151,14 @@ export async function getHistory(
 // 参考書取得 API
 // ========================================
 
-export async function getBooks(subject?: Subject): Promise<GetBooksResponse> {
+export async function getBooks(
+  subject?: Subject,
+  userId?: string
+): Promise<GetBooksResponse> {
   return callApi<GetBooksResponse>({
     action: 'get_books',
     ...(subject && { subject }),
+    ...(userId && { user_id: userId }),
   });
 }
 
