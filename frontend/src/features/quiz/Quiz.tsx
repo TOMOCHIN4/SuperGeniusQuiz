@@ -149,6 +149,20 @@ export const Quiz: React.FC = () => {
 
     setIsSubmitting(true);
 
+    // 時間切れ時: 未回答の問題を不正解として記録
+    const startIdx = isAnswered ? currentIndex + 1 : currentIndex;
+    for (let i = startIdx; i < questions.length; i++) {
+      const q = questions[i];
+      answersRef.current.push({
+        question_id: q.question_id,
+        genre_id: q.genre_id || q.book_id || 'unknown',
+        user_answer: -1, // 未回答
+        correct_index: q.correct_index,
+        question_text: q.question_text,
+        choices: q.choices,
+      });
+    }
+
     try {
       const response = await submitAnswers(
         user.user_id,
