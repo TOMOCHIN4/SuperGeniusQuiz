@@ -67,8 +67,8 @@ export const BookSelect: React.FC = () => {
     fetchBooks();
   }, [subject, user?.user_id]);
 
-  const handleBookClick = (bookId: string) => {
-    navigate(`/quiz?book_id=${encodeURIComponent(bookId)}`);
+  const handleBookClick = (bookId: string, bookSubject: Subject) => {
+    navigate(`/quiz?book_id=${encodeURIComponent(bookId)}&subject=${bookSubject}`);
   };
 
   const handleBack = () => {
@@ -132,7 +132,7 @@ export const BookSelect: React.FC = () => {
               key={book.book_id}
               className={styles.bookCard}
               interactive
-              onClick={() => handleBookClick(book.book_id)}
+              onClick={() => handleBookClick(book.book_id, book.subject)}
               accentColor={SUBJECT_COLORS[book.subject]}
             >
               <div className={styles.bookContent}>

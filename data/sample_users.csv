@@ -1,4 +1,0 @@
-user_id,username,password_hash,created_at,last_login
-user001,テスト太郎,test123,2025-12-29T00:00:00Z,
-user002,テスト花子,test456,2025-12-29T00:00:00Z,
-user003,テスト次郎,test789,2025-12-29T00:00:00Z,

@@ -1,223 +1,119 @@
-# プロジェクト: SuperGeniusQuiz v1.0（本番リリース版）
+# プロジェクト: SuperGeniusQuiz v1.1（参考書ベースシステム）
 
 ## ステータス概要（3行）
-- 現在地: Phase 5 参考書ベース機能 フロントエンド実装完了
-- 完成度: v1.0 Phase 4完了、参考書ベース機能（GAS API + フロントエンド）完了
-- 次の課題: 動作確認、Vercelデプロイ
+- 現在地: v1.1 参考書ベースシステム 本番稼働中 ✅
+- 完成度: 問題生成→シャッフル→API登録パイプライン完成
+- 次の課題: 追加コンテンツ登録
 
 ## バージョン履歴
 | バージョン | 状態 | 内容 |
 |-----------|------|------|
-| v0.5 MVP | ✅ バックアップ完了 | 基本機能完成（3,095問、ユーザー5名） |
-| v1.0 本番 | ✅ Phase 4 完了 | React + TypeScript + Vite + GAS API連携 |
-| v1.1 参考書 | 🔄 開発中 | 参考書ベース出題システム |
+| v0.5 MVP | ✅ バックアップ済 | GAS + HTML/JS、3,095問（削除済み） |
+| v1.0 本番 | ✅ 完了 | React + TypeScript + Vite + GAS API連携 |
+| v1.1 参考書 | ✅ 稼働中 | 参考書ベース出題システム（完全移行） |
 
-## 直近の成果
-**✅ Phase 5 参考書ベース機能 実装完了（2026-01-02）**
-- ✅ GAS API: create_book（参考書シート作成、usage_count付き）
-- ✅ GAS API: get_books（参考書一覧取得、シート名自動認識）
-- ✅ GAS API: get_book_questions（問題取得、usage_count考慮出題）
-- ✅ サンプルシート作成テスト完了（jp_テスト参考書、5問）
-- ✅ フロントエンド参考書選択画面（BookSelect）
-- ✅ Dashboard→参考書選択→クイズのフロー実装
-- ✅ Quiz: book_idパラメータ対応
-- ✅ ビルド成功確認
+## 現在のシステム構成
 
-**✅ Phase 4 GAS API連携 完了（2026-01-02）**
-- ✅ API通信基盤（services/api.ts）
-- ✅ 型定義（types/api.ts）
-- ✅ 認証コンテキスト（contexts/AuthContext.tsx）
-- ✅ ログインページ（features/login/）
-- ✅ AuthGuardコンポーネント
-- ✅ App.tsx（AuthProvider、ルーティング更新）
-- ✅ Dashboard: API連携（統計取得）
-- ✅ Quiz: API連携（問題取得、回答送信）
-- ✅ Settings: ログアウト機能
+### アーキテクチャ
+```
+[Vercel] ← React + TypeScript + Vite
+    ↓ API通信
+[GAS] ← Google Apps Script
+    ↓ データアクセス
+[Google Sheets] ← データベース
+```
 
-**✅ Phase 3 ページ実装 完了（2026-01-02）**
-- Dashboard: HeroMessage + DashboardMetrics + SubjectCard統合
-- Quiz: 問題表示、4択選択、タイマー、正誤判定
-- Result: 結果表示、ドーナツチャート、リトライ機能
-- History: 履歴一覧、教科別バッジ、進捗バー
-- Settings: ユーザー情報、学習設定、ログアウト
+### スプレッドシート構成
+| シート名 | 用途 |
+|---------|------|
+| Users | ユーザー管理（5名） |
+| Answers | 回答履歴 |
+| Sessions | セッション管理 |
+| jp_テスト参考書 | テスト用参考書（5問） |
+| jp_中学入試にでる順... | 四字熟語・ことわざ・慣用句（431問・シャッフル済） |
+| jp_中学入試でる順ポケでる... | 漢字・熟語 書き取り（1,061問・シャッフル済） |
 
-**✅ Phase 2.4 機能コンポーネント 完了（2026-01-02）**
-- HeroMessage: キャッチコピー表示、パーソナライズ対応
-- SubjectCard: 教科選択カード（4教科対応）、進捗バー付き
-- DashboardMetrics: 学習時間グラフ＋正答率表示
+※ Questionsシート（3,095問）は削除済み
 
-**✅ Phase 2.3 グラフコンポーネント 完了（2026-01-02）**
-- BarChart: 棒グラフ（曜日別学習時間など）、グラデーション対応
-- DoughnutChart: ドーナツチャート（中央に%表示）、総合正答率表示
+### 参考書システム仕様
+- **シート命名規則**: `{教科コード}_{参考書名}`
+- **教科コード**: jp(国語), math(算数), sci(理科), soc(社会)
+- **自動認識**: シート追加で自動的にUIに反映
+- **出題優先度**: usage_countが少ない問題から優先
 
-**✅ Phase 2.2 Header/Footer改良 完了（2026-01-02）**
-- Header: ロゴ中央配置、ユーザーアイコン（イニシャル/人型）
-- Footer: ナビゲーション（ホーム/履歴/設定）、NavLinkアクティブ表示
-- Dart Sass 3.0対応（darken()→変数置換）
+### 参考書シート列構造
+| 列 | 内容 |
+|----|------|
+| question_id | 問題番号（自動採番） |
+| question_text | 問題文 |
+| choice_1〜4 | 選択肢 |
+| correct_index | 正解番号（0-3） |
+| hint | ヒント |
+| usage_count | 出題回数（自動更新） |
 
-**✅ Phase 2.1 Atomsコンポーネント 完了（2026-01-02）**
-- Button: primary/secondary/ghost、sm/md/lg、loading状態
-- Card: インタラクティブ対応、accentColor（教科カラー帯）
-- Input: label、error状態、errorMessage
-- ProgressBar: 進捗率表示、カスタムカラー
-- Loading: スピナー、fullScreen対応
+## 画面遷移フロー
+```
+Login → Dashboard（教科選択）
+           ↓
+    /books?subject=jp（参考書選択）
+           ↓
+    /quiz?book_id=jp_参考書名（クイズ）
+           ↓
+    Result（結果）→ History / Settings
+```
 
-**✅ Phase 2 準備完了（2026-01-01）**
-- clsx + cn()ユーティリティ導入 ✅
-- SCSS自動インポート設定（v.$, m.@include）✅
+## GAS API一覧
 
-**✅ Phase 1 プロジェクト基盤構築 完了（2026-01-01）**
-- 1.1〜1.6 全タスク完了 ✅
+### 認証・ユーザー
+| API | 機能 |
+|-----|------|
+| login | ログイン認証 |
+| add_user | ユーザー追加 |
+| get_stats | ユーザー統計取得 |
 
-**✅ v0.5 MVPバックアップ作成（2026-01-01）**
-- バックアップ先: `SuperGeniusQuiz_v0.5_MVP_BACKUP/`
-- MVP開発版の完全なスナップショットを保存
+### 参考書システム
+| API | 機能 |
+|-----|------|
+| create_book | 参考書シート作成 |
+| get_books | 参考書一覧取得（user_id指定時は正答率付き） |
+| get_book_questions | 問題取得（usage_count考慮） |
 
-**✅ UI設計書・モックアップ追加（2026-01-01）**
-- docs/DEVEROPMENT.md（UI設計書 v5.0）
-- docs/MOCKUP_SAMPLE/（モックアップ画像2枚）
-
-**✅ 広報ドキュメント作成（2025-12-31）**
-- 社内広報用資料（docs/PR_INTERNAL.md）
-- 社外広報用資料（docs/PR_EXTERNAL.md）
-
-**✅ 本番ユーザー作成完了（2025-12-31）**
-- GASにユーザー追加API（add_user）を実装
-- 本番ユーザー2名を追加（あおい、ともひろ）
-- パスワード文字列保存の不具合修正（先頭0消失対策）
-
-**✅ 問題生成・インポート完了（2025-12-30）**
-- `models/gemini-3-flash-preview` で3,095問生成
-- 全40ファイルを個別インポート完了
-- 教科別: 国語865問、算数678問、理科767問、社会785問
-
-## コンポーネント完成度
-
-| コンポーネント | 完成度 | ステータス | 最終更新 |
-|-------------|--------|-----------|---------|
-| 設計ドキュメント | 100% | ✅ 完了 | 2025-12-30 |
-| ジャンル構造定義 | 100% | ✅ 完了 | 2025-12-30 |
-| データスキーマ | 100% | ✅ 完了（拡張済み） | 2025-12-29 |
-| GAS実装 | 100% | ✅ 完了（add_user API追加） | 2025-12-31 |
-| HTML/CSS/JS | 100% | ✅ 完了 | 2025-12-29 |
-| スプレッドシート | 100% | ✅ 完了（14列対応） | 2025-12-29 |
-| 問題データ | 100% | ✅ 3,095問インポート完了 | 2025-12-30 |
-| ユーザーデータ | 100% | ✅ 本番2名+テスト3名 | 2025-12-31 |
-| デプロイ | 100% | ✅ 完了 | 2025-12-29 |
-| 問題インポート機能 | 100% | ✅ 完了 | 2025-12-29 |
-| 使用頻度ベース出題 | 100% | ✅ 完了 | 2025-12-29 |
-| 新着通知UI | 100% | ✅ 完了 | 2025-12-29 |
-| 開発ツール | 100% | ✅ generate_questions.py 修正完了 | 2025-12-30 |
-| v1.0 フロントエンド基盤 | 100% | ✅ Phase 1 完了 | 2026-01-01 |
-| v1.0 UIコンポーネント | 100% | ✅ Phase 2 完了 | 2026-01-02 |
-| v1.0 ページ実装 | 100% | ✅ Phase 3 完了 | 2026-01-02 |
-| v1.0 API連携 | 100% | ✅ Phase 4 完了 | 2026-01-02 |
-| 参考書ベースGAS API | 100% | ✅ 完了 | 2026-01-02 |
-| 参考書ベースUI | 100% | ✅ 完了 | 2026-01-02 |
+### クイズ
+| API | 機能 |
+|-----|------|
+| submit_answers | 回答送信・保存 |
 
 ## 動作確認済み機能
 - ✅ ログイン/ログアウト
-- ✅ 教科選択
-- ✅ ジャンル選択
+- ✅ 教科選択 → 参考書選択
 - ✅ クイズ出題（タイマー付き）
-- ✅ 回答・正誤判定
-- ✅ 結果表示
+- ✅ 回答・正誤判定・結果表示
 - ✅ 回答履歴保存
-- ✅ 統計表示（基本）
-- ✅ 問題インポート（Python → GAS）
-- ✅ 新着問題UI表示
-- ✅ バッチ指定クイズ
-- ✅ 使用頻度ベース出題
+- ✅ 統計表示
+- ✅ 使用頻度ベース出題（usage_count）
+- ✅ 正答率表示（教科別・参考書別）
 
-## 開発フェーズ
-
-### Phase 1: MVP ✅ 完了
-- GAS + Sheets + HTML/JS
-- 基本的なクイズ機能
-
-### Phase 2A: コンテンツ優先（外部意見採用）✅ 完了
-- [x] 問題データ追加（45問：元5問 + 新規40問）✅
-- [x] ドッグフーディング（23件の回答データ作成）✅
-- [x] 問題インポート機能 ✅
-  - [x] スキーマ拡張（import_batch_id, usage_count）
-  - [x] GAS API追加（import_questions, get_recent_imports）
-  - [x] 使用頻度ベース出題ロジック
-  - [x] Python投入スクリプト
-  - [x] 新着問題UI
-
-### Phase 2B: コンテンツ拡充 ✅ 完了
-- [x] question_id自動採番機能追加 ✅
-- [x] IMPORT_SCHEMA.md作成 ✅
-- [x] 時事問題107問インポート ✅
-- [x] generate_questions.py 作成 ✅
-- [x] MODEL_ID修正 → `models/gemini-3-flash-preview` ✅
-- [x] data/generated/ 全削除 ✅
-- [x] 再生成（全教科: 3,095問）✅
-- [x] 品質確認 ✅
-- [x] インポート（40ファイル個別）✅
-- [x] 本番ユーザー作成 ✅
-- [x] ユーザー追加API実装 ✅
-
-### Phase 3: 品質向上
-- [ ] UI改善
-- [ ] パフォーマンス最適化
-
-### Phase 4: 拡張機能（将来）
+## 将来の拡張候補
 - [ ] 復習モード（間違えた問題）
 - [ ] 称号・バッジ機能
-
-### Phase 5: 参考書ベース機能 ✅ 実装完了
-- [x] データ構造設計（教科→参考書→問題）
-- [x] GAS API: create_book（シート作成、usage_count付き）
-- [x] GAS API: get_books（シート一覧自動認識）
-- [x] GAS API: get_book_questions（usage_count考慮出題）
-- [x] フロントエンド: 参考書選択画面（BookSelect）
-- [x] フロントエンド: 参考書別クイズ機能（Quiz book_id対応）
-- [ ] 既存問題データの参考書形式移行（任意）
-- [ ] 動作確認・Vercelデプロイ
-
-## 設計方針（確定事項）
-
-### アーキテクチャ
-- インフラ: GAS + Google Sheets（確定）
-- 通信: 初回一括読み込み・フロントエンド処理
-- データ: スプレッドシートに行追加でコンテンツ拡張
-
-### 機能スコープ
-- GroupID/復習/称号: 初期リリースでは実装しない
-- 画像: 非対応（テキストのみ）
-
-### 問題生成（修正版）
-- **モデル**: `models/gemini-3-flash-preview`（必須）
-- システムインストラクション: `KNOWLEDGE/SYSTEM_INSTRUCTION.txt`
-- 出力: TSV形式 → `import_questions.py` でインポート
+- [ ] 新着参考書通知
+- [ ] UI/UX改善
 
 ## リソース
 
-### GitHub（v1.0開発用）
-```
-https://github.com/TOMOCHIN4/SuperGeniusQuiz
-```
+### 本番URL
+| リソース | URL |
+|---------|-----|
+| **Vercel** | https://super-genius-quiz.vercel.app |
+| **GAS API** | https://script.google.com/macros/s/AKfycbwzRzBLo0D32sn5lI9vgvDsc7vmJW4VZ9_m1kM_he5iGPWF-CJ6steCcCGOFoTnxK3D/exec |
 
-### Vercel（デプロイ先）
-```
-https://vercel.com/tomo2chin2s-projects
-```
-
-### GAS API（バックエンド）
-```
-https://script.google.com/macros/s/AKfycbwzRzBLo0D32sn5lI9vgvDsc7vmJW4VZ9_m1kM_he5iGPWF-CJ6steCcCGOFoTnxK3D/exec
-```
-
-### スプレッドシート（データベース）
-```
-https://docs.google.com/spreadsheets/d/1BQpphBThc7AxFwaNhf5wGrj7Pj9adX4lZE4DKgI5XvM/edit
-```
-
-### GASプロジェクト（エディタ）
-```
-https://script.google.com/u/0/home/projects/1i2DjCUpbXE9tLqH1_8_sJJKysblzAQHQqtELA_Bq2CkMOY5_9_sgKAi-/edit
-```
+### 開発リソース
+| リソース | URL |
+|---------|-----|
+| GitHub | https://github.com/TOMOCHIN4/SuperGeniusQuiz |
+| Vercel Dashboard | https://vercel.com/tomo2chin2s-projects |
+| スプレッドシート | https://docs.google.com/spreadsheets/d/1BQpphBThc7AxFwaNhf5wGrj7Pj9adX4lZE4DKgI5XvM/edit |
+| GASエディタ | https://script.google.com/u/0/home/projects/1i2DjCUpbXE9tLqH1_8_sJJKysblzAQHQqtELA_Bq2CkMOY5_9_sgKAi-/edit |
 
 ### ユーザー
 | ユーザー名 | パスワード | 種別 |
@@ -231,22 +127,24 @@ https://script.google.com/u/0/home/projects/1i2DjCUpbXE9tLqH1_8_sJJKysblzAQHQqtE
 ### 開発ツール
 ```
 tools/
-├── ask_gemini.py        # Gemini 3 Pro 外部意見者API
-├── generate_questions.py # 問題生成スクリプト（gemini-3-flash-preview）
-├── import_questions.py  # 問題インポートスクリプト（timeout: 300秒）
+├── ask_gemini.py        # Gemini 外部意見者API
+├── generate_questions.py # 問題生成スクリプト
 └── requirements.txt     # 依存関係
+
+data/
+├── merge_json.py        # 複数JSONブロック結合スクリプト
+├── shuffle_json.py      # 選択肢シャッフルスクリプト
+└── *.md / *.json        # 参考書データ（生成済み問題）
 ```
 
 ### ドキュメント
 ```
-PLAN.md                    # 実装計画
+CLAUDE.md                  # プロジェクト管理ガイド
 STATUS.md                  # このファイル
 log/LOG.md                 # 開発ログ
-docs/IMPORT_SCHEMA.md      # 問題インポートスキーマ仕様
-docs/PR_INTERNAL.md        # 社内広報用資料
-docs/PR_EXTERNAL.md        # 社外広報用資料
-docs/DEVEROPMENT.md        # UI設計書 v5.0（トップ画面）
-docs/MOCKUP_SAMPLE/        # UIモックアップ画像
+data/PIPELINE.md           # 参考書データ登録パイプライン使用ガイド
+docs/参考書登録スキーマ.md    # 参考書登録API仕様
+docs/問題生成プロンプト.md    # LLM用クイズ問題生成ガイド
 ```
 
 ### バックアップ
@@ -254,11 +152,5 @@ docs/MOCKUP_SAMPLE/        # UIモックアップ画像
 ../SuperGeniusQuiz_v0.5_MVP_BACKUP/  # v0.5 MVPの完全バックアップ
 ```
 
-### 参考書ベース構造（v1.1）
-- シート命名規則: `{教科コード}_{参考書名}` (例: `jp_漢字マスター3000`)
-- 教科コード: jp(国語), math(算数), sci(理科), soc(社会)
-- シート追加で自動的にUIに反映
-- usage_countで出題回数少ない問題を優先
-
 ---
-**最終更新**: 2026-01-02（Phase 5 参考書ベースUI実装完了）
+**最終更新**: 2026-01-03 10:00
