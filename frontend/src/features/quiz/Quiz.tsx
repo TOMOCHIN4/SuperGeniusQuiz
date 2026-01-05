@@ -138,6 +138,7 @@ export const Quiz: React.FC = () => {
         correct_index: currentQuestion.correct_index,
         question_text: currentQuestion.question_text,
         choices: currentQuestion.choices,
+        hint: currentQuestion.hint,
       });
     },
     [isAnswered, currentQuestion]
@@ -160,6 +161,7 @@ export const Quiz: React.FC = () => {
         correct_index: q.correct_index,
         question_text: q.question_text,
         choices: q.choices,
+        hint: q.hint,
       });
     }
 
@@ -172,21 +174,29 @@ export const Quiz: React.FC = () => {
         timeLeft
       );
 
+      // 回答データをsessionStorageに保存（Result画面で使用）
+      sessionStorage.setItem('quizAnswers', JSON.stringify(answersRef.current));
+
+      // book_idがある場合はクエリパラメータに含める
+      const bookParam = bookId ? `&book_id=${encodeURIComponent(bookId)}` : '';
+
       if (response.success) {
         navigate(
-          `/result?score=${response.correct_count}&total=${response.total}&subject=${subject}`
+          `/result?score=${response.correct_count}&total=${response.total}&subject=${subject}${bookParam}`
         );
       } else {
         console.error('Failed to submit answers:', response.error);
         // エラーでも結果画面へ
         navigate(
-          `/result?score=${score}&total=${questions.length}&subject=${subject}`
+          `/result?score=${score}&total=${questions.length}&subject=${subject}${bookParam}`
         );
       }
     } catch (error) {
       console.error('Failed to submit answers:', error);
+      // book_idがある場合はクエリパラメータに含める
+      const bookParam = bookId ? `&book_id=${encodeURIComponent(bookId)}` : '';
       navigate(
-        `/result?score=${score}&total=${questions.length}&subject=${subject}`
+        `/result?score=${score}&total=${questions.length}&subject=${subject}${bookParam}`
       );
     }
   };

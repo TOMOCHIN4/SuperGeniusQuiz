@@ -95,6 +95,7 @@ export interface AnswerData {
   correct_index: number;
   question_text: string;
   choices: string[];
+  hint?: string;
   time_taken?: number;
 }
 

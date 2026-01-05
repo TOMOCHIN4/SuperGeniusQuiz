@@ -54,3 +54,128 @@
   @include m.flex-column;
   gap: v.$spacing-sm;
 }
+
+// ========================================
+// 回答詳細セクション
+// ========================================
+
+.answersSection {
+  @include m.flex-column;
+  gap: v.$spacing-md;
+}
+
+.sectionTitle {
+  font-size: v.$font-size-lg;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+  margin: 0;
+  padding-bottom: v.$spacing-sm;
+  border-bottom: 2px solid v.$divider;
+}
+
+.answerCard {
+  padding: v.$spacing-md;
+  border-left: 4px solid transparent;
+
+  &.correct {
+    border-left-color: v.$success;
+    background-color: rgba(v.$success, 0.03);
+  }
+
+  &.incorrect {
+    border-left-color: v.$error;
+    background-color: rgba(v.$error, 0.03);
+  }
+}
+
+.answerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: v.$spacing-sm;
+}
+
+.questionNumber {
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-secondary;
+}
+
+.statusBadge {
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
+  padding: v.$spacing-xs v.$spacing-sm;
+  border-radius: v.$radius-full;
+
+  &.correctBadge {
+    color: v.$success;
+    background-color: rgba(v.$success, 0.1);
+  }
+
+  &.incorrectBadge {
+    color: v.$error;
+    background-color: rgba(v.$error, 0.1);
+  }
+}
+
+.questionText {
+  font-size: v.$font-size-base;
+  color: v.$text-primary;
+  margin: 0 0 v.$spacing-md 0;
+  line-height: 1.6;
+}
+
+.userAnswer,
+.correctAnswer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$spacing-xs;
+  margin-bottom: v.$spacing-sm;
+}
+
+.answerLabel {
+  font-size: v.$font-size-sm;
+  color: v.$text-secondary;
+  font-weight: v.$font-weight-medium;
+}
+
+.correctText {
+  font-size: v.$font-size-sm;
+  color: v.$success;
+  font-weight: v.$font-weight-medium;
+}
+
+.incorrectText {
+  font-size: v.$font-size-sm;
+  color: v.$error;
+  font-weight: v.$font-weight-medium;
+}
+
+.unansweredText {
+  font-size: v.$font-size-sm;
+  color: v.$text-secondary;
+  font-style: italic;
+}
+
+.hintArea {
+  margin-top: v.$spacing-sm;
+  padding: v.$spacing-sm v.$spacing-md;
+  background-color: rgba(v.$brand-blue, 0.05);
+  border-radius: v.$radius-md;
+  border-left: 3px solid v.$brand-blue;
+}
+
+.hintLabel {
+  display: block;
+  font-size: v.$font-size-xs;
+  color: v.$brand-blue;
+  font-weight: v.$font-weight-bold;
+  margin-bottom: v.$spacing-xs;
+}
+
+.hintText {
+  font-size: v.$font-size-sm;
+  color: v.$text-primary;
+  margin: 0;
+  line-height: 1.6;
+}
