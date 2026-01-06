@@ -54,6 +54,7 @@ export const Quiz: React.FC = () => {
   const answersRef = useRef<AnswerData[]>([]);
   const sessionIdRef = useRef<string>(Date.now().toString());
   const timeLimitRef = useRef<number>(180);
+  const hasFinishedRef = useRef<boolean>(false); // 二重実行防止フラグ
 
   // 問題を取得
   useEffect(() => {
@@ -98,25 +99,6 @@ export const Quiz: React.FC = () => {
   const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
   const isLastQuestion = currentIndex === questions.length - 1;
 
-  // タイマー
-  useEffect(() => {
-    if (isLoadingQuestions || questions.length === 0) return;
-    if (isAnswered) return;
-
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          // 時間切れ - 全体のタイマー終了
-          finishQuiz();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [isLoadingQuestions, questions.length, isAnswered, currentIndex]);
-
   // 回答処理
   const handleAnswer = useCallback(
     (choiceIndex: number) => {
@@ -145,8 +127,12 @@ export const Quiz: React.FC = () => {
   );
 
   // クイズ終了処理
-  const finishQuiz = async () => {
-    if (!user || isSubmitting) return;
+  const finishQuiz = useCallback(async () => {
+    // 二重実行を防止（ref で即座にブロック）
+    if (hasFinishedRef.current) return;
+    hasFinishedRef.current = true;
+
+    if (!user) return;
 
     setIsSubmitting(true);
 
@@ -199,7 +185,27 @@ export const Quiz: React.FC = () => {
         `/result?score=${score}&total=${questions.length}&subject=${subject}${bookParam}`
       );
     }
-  };
+  }, [user, isAnswered, currentIndex, questions, subject, bookId, score, navigate, timeLeft]);
+
+  // タイマー
+  useEffect(() => {
+    if (isLoadingQuestions || questions.length === 0) return;
+    if (hasFinishedRef.current) return; // 既に終了している場合は何もしない
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          // 時間切れ - 全体のタイマー終了
+          clearInterval(timer); // タイマーを即座にクリア
+          finishQuiz();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isLoadingQuestions, questions.length, finishQuiz]);
 
   // 次の問題へ
   const handleNext = () => {
